@@ -1,34 +1,44 @@
+import { useState, useEffect } from "react";
+import { API_URL } from "../constants/api";
 
-import { useDispatch } from "react-redux";
-import { addToWishlist } from "../redux/wishlistSlice";
-import useFetch from "../hooks/useFetch";
-import Spinner from "./Spinner";
-import {  FaRegHeart} from "react-icons/fa";
+export default function ProductList({ addToCart }) {
+  const [products, setProducts] = useState([]);
+  const [search, setSearch] = useState("");
 
-const ProductList = () => {
-  const { data: products, loading, error } = useFetch("https://fakestoreapi.com/products");
-  const dispatch = useDispatch();
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("Error fetching products:", err));
+  }, []);
 
-  if (loading) return <Spinner />;
-  if (error) return <p className="text-red-500">Error loading products.</p>;
+  const filteredProducts = products.filter((product) =>
+    product.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {products.map((product) => (
-        <div key={product.id} className="border p-4 rounded-lg shadow-md">
-          <img src={product.image} alt={product.title} className="h-40 w-full object-contain" />
-          <h3 className="font-bold">{product.title}</h3>
-          <p>${product.price}</p>
-          <button
-  onClick={() => dispatch(addToWishlist(product))}
-  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2"
->
-  <FaRegHeart className="text-white" />
-</button>
-        </div>
-      ))}
+    <div>
+      <input
+        type="text"
+        placeholder="Search products..."
+        className="border p-2 w-full mb-4"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {filteredProducts.map((product) => (
+          <div key={product.id} className="border p-4 rounded-lg shadow">
+            <img src={product.image} alt={product.title} className="h-32 mx-auto mb-2" />
+            <h2 className="text-lg font-semibold">{product.title}</h2>
+            <p className="text-gray-700">${product.price}</p>
+            <button
+              onClick={() => addToCart(product)}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Add to Cart
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default ProductList;
+}

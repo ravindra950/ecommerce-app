@@ -1,12 +1,9 @@
 import ProductList from "../components/ProductList";
 
-const Home = () => {
+export default function Home({ addToCart }) {
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold">Product List</h2>
-      <ProductList />
+    <div>
+      <ProductList addToCart={addToCart} />
     </div>
   );
-};
-
-export default Home;
+}

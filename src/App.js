@@ -1,31 +1,41 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import ProductList from "./components/ProductList";
-import AdminPanel from "./components/AdminPanel";
-import Wishlist from "./components/WishList";
-import { Helmet } from "react-helmet";
-import { useSelector } from "react-redux";
+import Home from "./pages/Home";
+import CartPage from "./pages/CartPage";
 
+export default function App() {
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
-function App() {
-  const darkMode = useSelector((state) => state.darkMode);
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const addToCart = (product) => {
+    setCart((prevCart) => {
+      if (prevCart.some((item) => item.id === product.id)) {
+        return prevCart;
+      }
+      return [...prevCart, product];
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
+  };
 
   return (
     <Router>
-      <div className="bg-white shadow-md">
-        <Navbar />
-      </div>
-
-      <div className={`min-h-screen ${darkMode ? "dark bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+      <Navbar />
+      <div className="mt-16 p-4">
         <Routes>
-          <Route path="/" element={<ProductList />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/" element={<Home addToCart={addToCart} />} />
+          <Route path="/cart" element={<CartPage cart={cart} removeFromCart={removeFromCart} />} />
         </Routes>
       </div>
     </Router>
   );
 }
-
-export default App;

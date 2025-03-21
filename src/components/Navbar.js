@@ -1,18 +1,38 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import DarkModeToggle from "./DarkModeToggle";
+import { FiMenu, FiX } from "react-icons/fi";
 
-const Navbar = () => {
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <nav className="p-4 bg-gray-800 text-white flex justify-between">
-      <h1 className="text-lg font-bold">Admin Dashboard</h1>
-      <div>
-        <Link to="/" className="px-4">Home</Link>
-        <Link to="/wishlist" className="px-4">Wishlist</Link>
-        <Link to="/admin" className="px-4">Admin</Link>
+    <nav className="fixed top-0 left-0 w-full bg-blue-500 text-white p-4 shadow-md z-50">
+      <div className="max-w-6xl mx-auto flex justify-between items-center">
+        <Link to="/" className="text-xl font-bold">E-Commerce</Link>
+
+        {/* Mobile Menu Icon */}
+        <div className="md:hidden">
+          {menuOpen ? (
+            <FiX className="text-2xl cursor-pointer" onClick={() => setMenuOpen(false)} />
+          ) : (
+            <FiMenu className="text-2xl cursor-pointer" onClick={() => setMenuOpen(true)} />
+          )}
+        </div>
+
+        {/* Navigation Links (Desktop) */}
+        <div className="hidden md:flex space-x-6">
+          <Link to="/" className="hover:underline">Products</Link>
+          <Link to="/cart" className="hover:underline">Cart</Link>
+        </div>
       </div>
-      <DarkModeToggle />
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden flex flex-col mt-4 space-y-2">
+          <Link to="/" className="block p-2 bg-blue-600" onClick={() => setMenuOpen(false)}>Products</Link>
+          <Link to="/cart" className="block p-2 bg-blue-600" onClick={() => setMenuOpen(false)}>Cart</Link>
+        </div>
+      )}
     </nav>
   );
-};
-
-export default Navbar;
+}
